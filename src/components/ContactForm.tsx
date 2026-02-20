@@ -158,7 +158,7 @@ const ContactForm: React.FC = () => {
 
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label htmlFor="phone" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Phone Number</label>
+                                    <label htmlFor="phone" className="text-sm font-semibold text-slate-700 dark:text-slate-300">WhatsApp Number</label>
                                     <input
                                         type="tel"
                                         id="phone"
@@ -214,9 +214,6 @@ const ContactForm: React.FC = () => {
                                 </div>
                             )}
 
-                            <p className="text-center text-xs text-slate-500 italic">
-                                Your progress is automatically saved.
-                            </p>
                         </form>
                     </div>
                 </div>
