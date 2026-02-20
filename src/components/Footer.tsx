@@ -1,16 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { api } from '../services/api';
+import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
+    const [settings, setSettings] = useState<any>(null);
+
+    useEffect(() => {
+        api.getSettings().then(res => {
+            if (res.success) setSettings(res.data);
+        });
+    }, []);
+
+    const scrollToContact = () => {
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+            contactSection.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            window.location.href = '/#contact';
+        }
+    };
+
     return (
         <footer className="bg-slate-900 text-slate-300 pt-20 pb-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-                    <div className="col-span-2 lg:col-span-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                    <div className="sm:col-span-2 lg:col-span-1">
                         <div className="flex items-center gap-2 mb-8">
-                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-primary">
-                                <span className="material-symbols-rounded">school</span>
+                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-primary overflow-hidden p-1">
+                                <img src="/images/logo3.png" alt="Hikmah Abroad" className="h-28 w-auto object-contain" />
                             </div>
-                            <span className="text-2xl font-display font-extrabold tracking-tight text-white uppercase">HIKMAH ABROAD</span>
+                            <span className="text-2xl font-display font-extrabold tracking-tight text-white uppercase">{settings?.siteName || 'HIKMAH ABROAD'}</span>
                         </div>
                         <p className="text-slate-400 mb-8 leading-relaxed">
                             Leading education consultancy for international students in Malaysia. Empowering futures through quality guidance.
@@ -30,21 +49,21 @@ const Footer: React.FC = () => {
                     <div>
                         <h4 className="text-white font-bold mb-8">Resources</h4>
                         <ul className="space-y-4">
-                            <li><a className="hover:text-white transition-colors" href="#">Partner Universities</a></li>
-                            <li><a className="hover:text-white transition-colors" href="#">Popular Courses</a></li>
-                            <li><a className="hover:text-white transition-colors" href="#">Scholarship Guide</a></li>
-                            <li><a className="hover:text-white transition-colors" href="#">Visa Process</a></li>
-                            <li><a className="hover:text-white transition-colors" href="#">Cost of Living</a></li>
+                            <li><button onClick={scrollToContact} className="hover:text-white transition-colors">Partner Universities</button></li>
+                            <li><button onClick={scrollToContact} className="hover:text-white transition-colors">Popular Courses</button></li>
+                            <li><button onClick={scrollToContact} className="hover:text-white transition-colors">Scholarship Guide</button></li>
+                            <li><button onClick={scrollToContact} className="hover:text-white transition-colors">Visa Process</button></li>
+                            <li><button onClick={scrollToContact} className="hover:text-white transition-colors">Cost of Living</button></li>
                         </ul>
                     </div>
                     <div>
                         <h4 className="text-white font-bold mb-8">Our Services</h4>
                         <ul className="space-y-4">
-                            <li><a className="hover:text-white transition-colors" href="#">Free Consultation</a></li>
-                            <li><a className="hover:text-white transition-colors" href="#">Admission Assistance</a></li>
-                            <li><a className="hover:text-white transition-colors" href="#">Visa Support</a></li>
-                            <li><a className="hover:text-white transition-colors" href="#">Pre-Departure Briefing</a></li>
-                            <li><a className="hover:text-white transition-colors" href="#">Airport Pickup</a></li>
+                            <li><button onClick={scrollToContact} className="hover:text-white transition-colors">Free Consultation</button></li>
+                            <li><button onClick={scrollToContact} className="hover:text-white transition-colors">Admission Assistance</button></li>
+                            <li><button onClick={scrollToContact} className="hover:text-white transition-colors">Visa Support</button></li>
+                            <li><button onClick={scrollToContact} className="hover:text-white transition-colors">Pre-Departure Briefing</button></li>
+                            <li><button onClick={scrollToContact} className="hover:text-white transition-colors">Airport Pickup</button></li>
                         </ul>
                     </div>
                     <div>
@@ -52,24 +71,24 @@ const Footer: React.FC = () => {
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3">
                                 <span className="material-symbols-rounded text-accent">location_on</span>
-                                <span>Bukit Bintang, Kuala Lumpur, Malaysia</span>
+                                <span>{settings?.footer?.address || 'Bukit Bintang, Kuala Lumpur, Malaysia'}</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <span className="material-symbols-rounded text-accent">call</span>
-                                <span>+60 123 456 789</span>
+                                <span>{settings?.footer?.phone || '+601139638244'}</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <span className="material-symbols-rounded text-accent">mail</span>
-                                <span>hello@tawakkul.edu.my</span>
+                                <span>{settings?.footer?.email || 'hikmahabroad@gmail.com'}</span>
                             </li>
                         </ul>
                     </div>
                 </div>
                 <div className="pt-10 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <p className="text-sm">© 2026 All Rights Reserved By Hikmah Abroad</p>
+                    <p className="text-sm">© {new Date().getFullYear()} All Rights Reserved By {settings?.siteName || 'Hikmah Abroad'}</p>
                     <div className="flex gap-8 text-sm">
-                        <a className="hover:text-white transition-colors" href="#">Privacy Policy</a>
-                        <a className="hover:text-white transition-colors" href="#">Terms of Service</a>
+                        <Link to="#" className="hover:text-white transition-colors">Privacy Policy</Link>
+                        <Link to="#" className="hover:text-white transition-colors">Terms of Service</Link>
                     </div>
                 </div>
             </div>
