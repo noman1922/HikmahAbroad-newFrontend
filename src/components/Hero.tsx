@@ -20,6 +20,16 @@ const Hero: React.FC = () => {
         ? heroData.banners[0]
         : "https://images.unsplash.com/photo-1592280771190-3e2e4d571952?q=80&w=1974&auto=format&fit=crop";
 
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const handleSearch = () => {
+        if (searchTerm.trim()) {
+            window.location.href = `/universities?search=${encodeURIComponent(searchTerm.trim())}`;
+        } else {
+            window.location.href = "/universities";
+        }
+    };
+
     return (
         <section className="relative pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
             <div className="absolute inset-0 z-0 text-[#06083D]">
@@ -42,9 +52,21 @@ const Hero: React.FC = () => {
                             <div className="flex-grow flex flex-col sm:flex-row items-center bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-2 border border-slate-100 gap-2">
                                 <div className="flex items-center w-full px-4">
                                     <span className="material-symbols-rounded text-slate-400">search</span>
-                                    <input className="w-full bg-transparent border-none focus:ring-0 text-slate-900 px-4 py-3 placeholder:text-slate-400 outline-none" placeholder="Search for your ideal university..." type="text" />
+                                    <input
+                                        className="w-full bg-transparent border-none focus:ring-0 text-slate-900 px-4 py-3 placeholder:text-slate-400 outline-none"
+                                        placeholder="Search for your ideal university..."
+                                        type="text"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                                    />
                                 </div>
-                                <button className="w-full sm:w-auto bg-primary text-white px-8 py-4 sm:py-3 rounded-xl font-bold hover:bg-opacity-90 transition-all whitespace-nowrap" onClick={() => window.location.href = "/universities"}>Find Now</button>
+                                <button
+                                    className="w-full sm:w-auto bg-primary text-white px-8 py-4 sm:py-3 rounded-xl font-bold hover:bg-opacity-90 transition-all whitespace-nowrap"
+                                    onClick={handleSearch}
+                                >
+                                    Find Now
+                                </button>
                             </div>
                         </div>
                         <div className="flex items-center gap-8">

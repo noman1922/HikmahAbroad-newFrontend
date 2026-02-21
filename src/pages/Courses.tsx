@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 
 const Courses: React.FC = () => {
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState(new URLSearchParams(window.location.search).get('search') || '');
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [courses, setCourses] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedCourse, setSelectedCourse] = useState<any>(null);
@@ -116,30 +117,49 @@ const Courses: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-slate-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+                {/* Mobile Filter Toggle */}
+                <div className="lg:hidden mb-6">
+                    <button
+                        onClick={() => setIsFilterOpen(!isFilterOpen)}
+                        className="w-full flex items-center justify-between bg-white px-6 py-4 rounded-xl shadow-sm border border-slate-100 font-bold text-slate-900"
+                    >
+                        <span className="flex items-center gap-2">
+                            <span className="material-symbols-rounded text-primary">filter_list</span>
+                            Filter
+                        </span>
+                        <span className={`material-symbols-rounded transition-transform duration-300 ${isFilterOpen ? 'rotate-180' : ''}`}>
+                            expand_more
+                        </span>
+                    </button>
+                </div>
+
                 <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Sidebar */}
-                    <aside className="w-full lg:w-80 bg-white p-6 rounded-xl shadow-sm h-fit">
-                        <h2 className="text-xl font-bold mb-6">Filter Your Best Course</h2>
+                    {/* Sidebar / Collapsible Filter */}
+                    <aside className={`w-full lg:w-80 bg-white p-6 rounded-xl shadow-sm h-fit transition-all duration-300 overflow-hidden lg:block ${isFilterOpen ? 'block mb-6' : 'hidden'}`}>
+                        <h2 className="text-xl font-bold mb-6 hidden lg:block">Filter Your Best Course</h2>
 
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Search by name</label>
-                                <input
-                                    type="text"
-                                    placeholder="Type Course Name"
-                                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
+                                <label className="block text-sm font-medium text-slate-700 mb-2 font-semibold">Search by name</label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        placeholder="Type Course Name"
+                                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all pl-10"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                    <span className="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                                </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Course Level</label>
-                                <div className="space-y-2">
+                                <label className="block text-sm font-medium text-slate-700 mb-2 font-semibold">Course Level</label>
+                                <div className="space-y-2.5">
                                     {levels.map(level => (
-                                        <label key={level} className="flex items-center gap-2 cursor-pointer group">
-                                            <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" />
+                                        <label key={level} className="flex items-center gap-3 cursor-pointer group">
+                                            <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" />
                                             <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">{level}</span>
                                         </label>
                                     ))}
@@ -147,19 +167,30 @@ const Courses: React.FC = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Search by university location</label>
-                                <select className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none cursor-pointer">
-                                    <option>All Locations</option>
-                                    <option>Selangor</option>
-                                    <option>Kuala Lumpur</option>
-                                </select>
+                                <label className="block text-sm font-medium text-slate-700 mb-2 font-semibold">Search by location</label>
+                                <div className="relative">
+                                    <select className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none cursor-pointer appearance-none">
+                                        <option>All Locations</option>
+                                        <option>Selangor</option>
+                                        <option>Kuala Lumpur</option>
+                                    </select>
+                                    <span className="material-symbols-rounded absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+                                </div>
                             </div>
                         </div>
                     </aside>
 
                     {/* Main Content */}
                     <div className="flex-1">
-                        <h1 className="text-2xl font-bold mb-6">Course List</h1>
+                        <div className="flex items-center justify-between mb-6">
+                            <h1 className="text-2xl font-bold text-slate-900">Course List</h1>
+                            <div className="text-sm text-slate-500 font-medium hidden sm:block">
+                                Showing {courses.filter(course =>
+                                    course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    course.universityName?.toLowerCase().includes(searchTerm.toLowerCase())
+                                ).length} results
+                            </div>
+                        </div>
 
                         {isLoading ? (
                             <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-slate-100 shadow-sm">
@@ -167,7 +198,7 @@ const Courses: React.FC = () => {
                                 <p className="text-slate-500 font-medium">Fetching courses...</p>
                             </div>
                         ) : (
-                            <div className="space-y-4">
+                            <div className="grid gap-4">
                                 {courses.filter(course =>
                                     course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                     course.universityName?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -176,44 +207,44 @@ const Courses: React.FC = () => {
                                         course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                         course.universityName?.toLowerCase().includes(searchTerm.toLowerCase())
                                     ).map(course => (
-                                        <div key={course.id} className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row items-center gap-6 hover:shadow-md transition-shadow text-center sm:text-left">
-                                            <div className="w-20 h-20 flex-shrink-0 bg-slate-50 rounded-lg flex items-center justify-center p-2 overflow-hidden border border-slate-100">
+                                        <div key={course.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col sm:flex-row shadow-sm border border-slate-100 flex flex-col sm:flex-row items-center gap-6 hover:shadow-md transition-all duration-300 group">
+                                            <div className="w-24 h-24 flex-shrink-0 bg-slate-50 rounded-2xl flex items-center justify-center p-4 overflow-hidden border border-slate-100 shadow-inner group-hover:scale-105 transition-transform">
                                                 {course.imageUrl ? (
-                                                    <img src={course.imageUrl} alt={course.name} className="max-w-full max-h-full object-cover rounded" />
+                                                    <img src={course.imageUrl} alt={course.name} className="max-w-full max-h-full object-cover rounded-xl" />
                                                 ) : (
-                                                    <span className="material-symbols-rounded text-3xl sm:text-4xl text-slate-300">book_5</span>
+                                                    <span className="material-symbols-rounded text-4xl text-slate-300">book_5</span>
                                                 )}
                                             </div>
-                                            <div className="flex-1">
-                                                <h3 className="text-xl font-bold text-slate-900">{course.name}</h3>
-                                                <p className="text-primary font-bold mt-1 uppercase text-xs tracking-wider border-b-2 border-primary/10 w-fit pb-0.5">
+                                            <div className="flex-1 text-center sm:text-left">
+                                                <h3 className="text-xl font-bold text-slate-900 group-hover:text-primary transition-colors">{course.name}</h3>
+                                                <p className="text-primary font-bold mt-1 uppercase text-[10px] tracking-widest bg-primary/5 w-fit px-2 py-0.5 rounded sm:mx-0 mx-auto">
                                                     {course.universityName || course.university || "Hikmah Partner University"}
                                                 </p>
-                                                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-6 mt-3 text-slate-600 text-sm">
-                                                    <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+                                                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-4 text-slate-600 text-sm">
+                                                    <span className="flex items-center gap-1.5 bg-white border border-slate-100 px-3 py-1.5 rounded-full shadow-sm">
                                                         <span className="material-symbols-rounded text-lg text-primary">layers</span>
                                                         {course.level}
                                                     </span>
-                                                    <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+                                                    <span className="flex items-center gap-1.5 bg-white border border-slate-100 px-3 py-1.5 rounded-full shadow-sm">
                                                         <span className="material-symbols-rounded text-lg text-primary">schedule</span>
                                                         {course.duration || 'Flexible'}
                                                     </span>
-                                                    <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100 font-bold text-slate-900">
+                                                    <span className="flex items-center gap-1.5 bg-white border border-slate-100 px-3 py-1.5 rounded-full shadow-sm font-bold text-slate-900">
                                                         <span className="material-symbols-rounded text-lg text-emerald-500">payments</span>
                                                         {course.tuitionFee || 'Contact'}
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
+                                            <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto mt-4 sm:mt-0">
                                                 <button
                                                     onClick={() => handleOpenApply(course)}
-                                                    className="flex-1 bg-slate-900 text-white px-4 py-2 rounded-lg font-semibold hover:bg-slate-800 transition-colors text-sm sm:text-base whitespace-nowrap"
+                                                    className="flex-1 bg-slate-900 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-slate-800 transition-colors text-sm whitespace-nowrap"
                                                 >
                                                     Apply
                                                 </button>
                                                 <button
                                                     onClick={() => handleOpenDetails(course)}
-                                                    className="flex-1 bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-90 transition-colors text-sm sm:text-base whitespace-nowrap"
+                                                    className="flex-1 bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-opacity-90 transition-colors text-sm whitespace-nowrap"
                                                 >
                                                     Details
                                                 </button>
@@ -221,10 +252,12 @@ const Courses: React.FC = () => {
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="text-center py-20 bg-white rounded-xl border border-slate-100 shadow-sm">
-                                        <span className="material-symbols-rounded text-6xl text-slate-300 mb-4">search_off</span>
-                                        <h3 className="text-xl font-bold text-slate-900 mb-2">No Courses Found</h3>
-                                        <p className="text-slate-500">We couldn't find any courses matching your search.</p>
+                                    <div className="text-center py-24 bg-white rounded-3xl border border-slate-100 shadow-sm px-6">
+                                        <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                            <span className="material-symbols-rounded text-4xl text-slate-300">search_off</span>
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-slate-900 mb-2">No Courses Found</h3>
+                                        <p className="text-slate-500 max-w-sm mx-auto">We couldn't find any courses matching your search criteria. Please try a different name or location.</p>
                                     </div>
                                 )}
                             </div>

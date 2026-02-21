@@ -25,8 +25,6 @@ const Navbar: React.FC = () => {
                         {/* LOGO PLACEHOLDER: Uncomment the <img> tag below and provide your logo path to replace the icon branding */}
                         <img src="/images/logo3.png" alt="Hikmah Abroad" className="h-24 w-auto object-contain" />
 
-
-
                     </Link>
 
                     {/* Desktop Menu */}
